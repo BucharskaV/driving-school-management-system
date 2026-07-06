@@ -1,0 +1,32 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# User files
+*.user
+*.suo
+
+# Logs
+*.log
+
+# NuGet
+packages/
+
+# Node
+node_modules/
+
+# Angular
+dist/
+
+# Environment
+.env
+
+# Others
+*.db
