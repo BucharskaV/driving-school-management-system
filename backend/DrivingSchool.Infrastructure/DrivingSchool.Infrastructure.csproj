@@ -7,11 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Data\" />
-      <Folder Include="Repositories\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.28" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.28">
         <PrivateAssets>all</PrivateAssets>
@@ -22,6 +17,10 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DrivingSchool.Domain\DrivingSchool.Domain.csproj" />
     </ItemGroup>
 
 </Project>

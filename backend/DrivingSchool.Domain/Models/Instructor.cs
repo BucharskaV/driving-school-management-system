@@ -26,7 +26,7 @@ public class Instructor : User
     
     private Instructor() : base() { }
 
-    public Instructor(List<InstructorType> types, string firstName, string lastName, string pesel, string phoneNumber, string? email, string instructorCode, decimal baseSalary, decimal? bonus, string? drivingLicenseNumber = null, string? medicalCertificateNumber = null) : base(firstName, lastName, pesel, phoneNumber, email)
+    public Instructor(List<InstructorType> types, string firstName, string lastName, Role role, string pesel, string phoneNumber, string? email, string instructorCode, decimal baseSalary, decimal? bonus, string? drivingLicenseNumber = null, string? medicalCertificateNumber = null) : base(firstName, lastName, role, pesel, phoneNumber, email)
     {
         if (types == null || types.Count == 0)
             throw new ArgumentException("Instructor must have at least one specialization");

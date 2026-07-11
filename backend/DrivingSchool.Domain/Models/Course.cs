@@ -12,8 +12,9 @@ public class Course
     public virtual ICollection<Lesson> Lessons => [];
     
     private Course(){}
-    internal Course(Category category, string title, decimal price)
+    public Course(Category category, string title, decimal price)
     {
+        ArgumentNullException.ThrowIfNull(category);
         Title = title;
         Price = price;
         Category = category;

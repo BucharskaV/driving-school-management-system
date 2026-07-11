@@ -1,4 +1,6 @@
-﻿namespace DrivingSchool.Domain.Models;
+﻿using DrivingSchool.Domain.Enums;
+
+namespace DrivingSchool.Domain.Models;
 
 public class Student : User
 {
@@ -23,12 +25,12 @@ public class Student : User
     
     private Student() : base(){}
 
-    public Student(string firstName, string lastName, string pesel, string phoneNumber, string email, DateTime dateOfBirth) : base(firstName, lastName, pesel, phoneNumber, email)
+    public Student(string firstName, string lastName, string pesel, Role role, string phoneNumber, string email, DateTime dateOfBirth) : base(firstName, lastName, role, pesel, phoneNumber, email)
     {
         DateOfBirth = dateOfBirth;
     }
 
-    public Student(string firstName, string lastName, string pesel, string phoneNumber, DateTime dateOfBirth) : base(firstName, lastName, pesel, phoneNumber)
+    public Student(string firstName, string lastName, string pesel, Role role, string phoneNumber, DateTime dateOfBirth) : base(firstName, lastName, role, pesel, phoneNumber)
     {
         DateOfBirth = dateOfBirth;
     }

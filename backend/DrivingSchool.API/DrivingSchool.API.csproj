@@ -19,4 +19,8 @@
       <Folder Include="Middleware\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DrivingSchool.Infrastructure\DrivingSchool.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
