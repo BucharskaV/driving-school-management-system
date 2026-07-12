@@ -37,10 +37,24 @@ public class CourseRepository(ApplicationDbContext context) : ICourseRepository
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Course>> GetAllCoursesByCategoryId(int categoryId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Course>> GetCoursesByCategoryIdAsync(int categoryId, CancellationToken cancellationToken = default)
     {
         return await context.Courses
             .Where(c => c.CategoryId == categoryId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Course>> GetEnrolledCoursesByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
+    {
+        return await context.Courses
+            .Include(c => c.Lessons)
+            .ThenInclude(l => l.LessonProgresses
+                .Where(lp => lp.StudentId == studentId))
+            .Include(c => c.Lessons)
+            .ThenInclude(l => ((PracticalLesson)l).Car)
+            .Include(c => c.Lessons)
+            .ThenInclude(l => ((PracticalLesson)l).StartLocation)
+            .Where(c => c.Enrollments.Any(e => e.StudentId == studentId))
             .ToListAsync(cancellationToken);
     }
 }

@@ -6,7 +6,6 @@ public abstract class Lesson
     public string Name { get; set; }
     public int SequenceNumber { get; set; }
     public TimeSpan Duration { get; set; }
-    
     public virtual ICollection<LessonProgress> LessonProgresses { get; set; } = [];
     public int CourseId { get; private init; }
     public virtual Course Course { get; private init; }

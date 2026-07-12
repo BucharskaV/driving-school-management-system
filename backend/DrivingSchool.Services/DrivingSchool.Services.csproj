@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Contracts\" />
+      <Folder Include="Contracts\Requests\" />
+      <Folder Include="Contracts\Responses\" />
       <Folder Include="Mappers\" />
       <Folder Include="Security\" />
       <Folder Include="Validators\" />

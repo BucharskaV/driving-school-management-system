@@ -13,5 +13,6 @@ public interface ICourseRepository
     Task UpdateAsync(Course course, CancellationToken cancellationToken = default);
 
     Task DeleteAsync(Course course, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Course>> GetAllCoursesByCategoryId(int categoryId, CancellationToken cancellationToken);
+    Task<IEnumerable<Course>> GetCoursesByCategoryIdAsync(int categoryId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Course>> GetEnrolledCoursesByStudentIdAsync(int studentId, CancellationToken cancellationToken = default);
 }

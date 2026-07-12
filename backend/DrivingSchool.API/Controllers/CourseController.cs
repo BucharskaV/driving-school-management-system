@@ -17,11 +17,20 @@ public class CourseController : ControllerBase
     [HttpGet("{categoryId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllCoursesByCategoryId(int categoryId, CancellationToken cancellationToken)
     {
-        var courses = await _courseService.GetAllCoursesByCategoryIdAsync(categoryId, cancellationToken);
+        var courses = await _courseService.GetCoursesByCategoryIdAsync(categoryId, cancellationToken);
+        return Ok(courses);
+    }
+    
+    [HttpGet("enrolled/{studentId:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetEnrolledCoursesByStudentId(int studentId, CancellationToken cancellationToken)
+    {
+        var courses = await _courseService.GetEnrolledCoursesByStudentIdAsync(studentId, cancellationToken);
         return Ok(courses);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using DrivingSchool.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrivingSchool.API.Middleware;
@@ -9,7 +10,12 @@ public class ExceptionMiddleware
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private static readonly IReadOnlyDictionary<Type, HttpStatusCode> StatusCodeMap = new Dictionary<Type, HttpStatusCode>
     {
-        [typeof(ArgumentNullException)] = HttpStatusCode.NotFound
+        [typeof(DuplicateEnrollmentException)] = HttpStatusCode.BadRequest,
+        
+        [typeof(ArgumentNullException)] = HttpStatusCode.NotFound,
+        [typeof(CategoryNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(StudentNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(CourseNotFoundException)] = HttpStatusCode.NotFound,
     };
  
     private readonly RequestDelegate _next;

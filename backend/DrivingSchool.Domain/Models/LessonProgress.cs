@@ -20,6 +20,7 @@ public class LessonProgress
     public int? InstructorId { get; set; }
     private Instructor? _instructor;
     public virtual Instructor? Instructor{ get; set; }
+    public int? ExtraFeeId { get; set; }
     public virtual ExtraFee? ExtraFee { get; init; }
 
     private LessonProgress(){}
