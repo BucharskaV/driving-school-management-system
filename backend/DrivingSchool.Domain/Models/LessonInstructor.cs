@@ -5,29 +5,11 @@ namespace DrivingSchool.Domain.Models;
 
 public class LessonInstructor
 {
-    public int LessonId { get; private set; }
-    public virtual Lesson Lesson { get; private set; }
-    public int InstructorId { get; private set; }
-    public virtual Instructor Instructor { get; private set; }
-    
-    private string _instructorCode;
-    public string InstructorCode
-    {
-        get => _instructorCode;
-        init
-        {
-            if(String.IsNullOrEmpty(value))
-            {
-                throw new ArgumentNullException("Instructor's code cannot be empty");
-            }
-            Regex codeRegex = new Regex("^[A-Z]{2}\\d{5}$");
-            if (!codeRegex.IsMatch(value.Trim()))
-            {
-                throw new ArgumentException("Invalid instructor's code. The format is: 2 uppercase letters followed by 5 digits");
-            }
-            _instructorCode = value.Trim();
-        }
-    }
+    public int LessonId { get; private init; }
+    public virtual Lesson Lesson { get; private init; }
+    public int InstructorId { get; private init; }
+    public virtual Instructor Instructor { get; private init; }
+    public string InstructorCode{ get; private init; }
     
     private LessonInstructor() {}
 

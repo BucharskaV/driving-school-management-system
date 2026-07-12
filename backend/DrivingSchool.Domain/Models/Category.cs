@@ -5,7 +5,7 @@ public class Category
     public int Id { get; private init; }
     public string Name{ get; set; }
     public int MinimumAge{ get; set; }
-    public virtual ICollection<Course> Courses => [];
+    public virtual ICollection<Course> Courses { get; set; } = [];
 
     private Category (){}
     public Category(string name, int minimumAge)

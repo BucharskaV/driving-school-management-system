@@ -8,12 +8,13 @@
 
     <ItemGroup>
       <Folder Include="Contracts\" />
-      <Folder Include="DTOs\" />
-      <Folder Include="Implementations\" />
-      <Folder Include="Interfaces\" />
       <Folder Include="Mappers\" />
       <Folder Include="Security\" />
       <Folder Include="Validators\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DrivingSchool.Domain\DrivingSchool.Domain.csproj" />
     </ItemGroup>
 
 </Project>

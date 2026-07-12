@@ -7,10 +7,10 @@ public abstract class Lesson
     public int SequenceNumber { get; set; }
     public TimeSpan Duration { get; set; }
     
-    public virtual ICollection<LessonProgress> LessonProgresses => [];
+    public virtual ICollection<LessonProgress> LessonProgresses { get; set; } = [];
     public int CourseId { get; private init; }
     public virtual Course Course { get; private init; }
-    public virtual ICollection<LessonInstructor> LessonInstructors => [];
+    public virtual ICollection<LessonInstructor> LessonInstructors { get; set; } = [];
     protected Lesson(){}
     protected Lesson(Course course, string name, int sequenceNumber, TimeSpan duration)
     {

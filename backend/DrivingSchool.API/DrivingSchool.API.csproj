@@ -15,12 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\" />
-      <Folder Include="Middleware\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\DrivingSchool.Infrastructure\DrivingSchool.Infrastructure.csproj" />
+      <ProjectReference Include="..\DrivingSchool.Services\DrivingSchool.Services.csproj" />
     </ItemGroup>
 
 </Project>

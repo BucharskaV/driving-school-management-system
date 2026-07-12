@@ -1,4 +1,9 @@
+using DrivingSchool.API.Middleware;
+using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Infrastructure.Data;
+using DrivingSchool.Infrastructure.Repositories;
+using DrivingSchool.Services.Implementations;
+using DrivingSchool.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +18,11 @@ var db = builder.Services.AddDbContext<ApplicationDbContext>(options =>
         )
     )
 );
-// Add services to the container.
+
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -29,6 +38,8 @@ using (var scope = app.Services.CreateScope())
     DataInitializer.Initialize(dbContext);
 }
 
+app.UseGlobalExceptionHandling();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -37,7 +48,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();

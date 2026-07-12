@@ -6,9 +6,9 @@ namespace DrivingSchool.Infrastructure.Data;
 public static class DataInitializer
 {
     //booked setting for checking alternative flows of "Book Lesson" use case :
-    //21.06.2026 14.30(utc)->16.30 booked instructor FirstnameT9 LastnameT9 - TR00009
-    //22.06.2026 14.30(utc)->16.30 booked room for offline theoretical lesson Room A1 
-    //24.06.2026 14.30(utc)->16.30 booked car for practical lesson 
+    //21.12.2026 14.30(utc)->16.30 booked instructor FirstnameT9 LastnameT9 - TR00009
+    //22.12.2026 14.30(utc)->16.30 booked room for offline theoretical lesson Room A1 
+    //24.12.2026 14.30(utc)->16.30 booked car for practical lesson 
     public static void Initialize(ApplicationDbContext dbContext)
     {
         dbContext.Database.EnsureDeleted();
@@ -225,13 +225,13 @@ public static class DataInitializer
         {
             var instructor = bookingTeacher.Lesson.LessonInstructors.First().Instructor;
             bookingTeacher.ProgressStatus = ProgressStatus.Booked; 
-            bookingTeacher.StartTime = new DateTime(2026, 6, 21, 14, 30, 0, DateTimeKind.Utc);
+            bookingTeacher.StartTime = new DateTime(2026, 12, 21, 14, 30, 0, DateTimeKind.Utc);
             bookingTeacher.Note = "Note from instructor";
             bookingTeacher.Instructor = instructor;
             bookingTeacher.InstructorId = instructor.Id;
         }
 
-        var fee = bookingTeacher?.CreateExtraFee(50);
+        var fee = new ExtraFee(bookingTeacher, 50);
 
         dbContext.LessonProgresses.AddRange(lessonProgresses);
         if (fee != null) dbContext.ExtraFees.Add(fee);
@@ -244,7 +244,7 @@ public static class DataInitializer
         {
             var instructor = bookingRoom.Lesson.LessonInstructors.First().Instructor;
             bookingRoom.ProgressStatus = ProgressStatus.Booked; 
-            bookingRoom.StartTime = new DateTime(2026, 6, 22, 14, 30, 0, DateTimeKind.Utc);
+            bookingRoom.StartTime = new DateTime(2026, 12, 22, 14, 30, 0, DateTimeKind.Utc);
             bookingRoom.Note = "Note from instructor";
             bookingRoom.Instructor = instructor;
             bookingRoom.InstructorId = instructor.Id;
@@ -255,7 +255,7 @@ public static class DataInitializer
         {
             var instructor = bookingCar.Lesson.LessonInstructors.First().Instructor;
             bookingCar.ProgressStatus = ProgressStatus.Booked; 
-            bookingCar.StartTime = new DateTime(2026, 6, 24, 14, 30, 0, DateTimeKind.Utc);
+            bookingCar.StartTime = new DateTime(2026, 12, 24, 14, 30, 0, DateTimeKind.Utc);
             bookingCar.Note = "Note from instructor";
             bookingCar.Instructor = instructor;
             bookingCar.InstructorId = instructor.Id;

@@ -5,8 +5,8 @@ namespace DrivingSchool.Domain.Models;
 
 public class Instructor : User
 {
-    public virtual ICollection<Certification> Certifications => [];
-    public virtual ICollection<InstructorSpecialization> Specializations => [];
+    public virtual ICollection<Certification> Certifications { get; set; } = [];
+    public virtual ICollection<InstructorSpecialization> Specializations{ get; set; } = [];
     
     private string _instructorCode;
     public string InstructorCode { get; init; }
@@ -21,8 +21,8 @@ public class Instructor : User
     private string? _medicalCertificateNumber;
     public string? MedicalCertificateNumber { get; set; }
     
-    public virtual ICollection<LessonProgress> LessonProgresses => [];
-    public virtual ICollection<LessonInstructor> LessonInstructors => [];
+    public virtual ICollection<LessonProgress> LessonProgresses { get; set; } = [];
+    public virtual ICollection<LessonInstructor> LessonInstructors { get; set; } = [];
     
     private Instructor() : base() { }
 

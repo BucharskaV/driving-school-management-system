@@ -8,7 +8,7 @@ public class Car
     public string Brand { get; init; }
     public string Model { get; init; }
     public string RegistrationNumber { get; set; }
-    public virtual ICollection<PracticalLesson> PracticalLessons => [];
+    public virtual ICollection<PracticalLesson> PracticalLessons { get; set; } = [];
     
     private Car(){}
     public Car(string brand, string model, string registrationNumber)
