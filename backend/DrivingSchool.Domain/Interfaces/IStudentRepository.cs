@@ -9,4 +9,5 @@ public interface IStudentRepository
     Task AddAsync(Student student, CancellationToken cancellationToken = default);
     Task UpdateAsync(Student student, CancellationToken cancellationToken = default);
     Task DeleteAsync(Student student, CancellationToken cancellationToken = default);
+    Task<bool> IsStudentAvailable(int studentId, DateTime start, DateTime end, CancellationToken cancellationToken = default);
 }

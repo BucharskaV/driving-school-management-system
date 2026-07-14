@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Interfaces;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -33,5 +34,16 @@ public class CarRepository(ApplicationDbContext context) : ICarRepository
     {
         context.Cars.Remove(car);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsCarAvailableAsync(int carId, DateTime start, DateTime end, CancellationToken cancellationToken = default)
+    {
+        return !await context.LessonProgresses
+            .Where(lp => lp.Lesson is PracticalLesson)
+            .AnyAsync(lp =>
+                ((PracticalLesson)lp.Lesson).CarId == carId &&
+                lp.ProgressStatus == ProgressStatus.Booked &&
+                lp.StartTime < end && lp.EndTime > start,
+                cancellationToken);
     }
 }

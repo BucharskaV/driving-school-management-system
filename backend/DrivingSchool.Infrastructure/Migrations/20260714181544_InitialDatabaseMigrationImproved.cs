@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DrivingSchool.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDatabaseMigrationWithInsertedData : Migration
+    public partial class InitialDatabaseMigrationImproved : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -239,7 +239,8 @@ namespace DrivingSchool.Infrastructure.Migrations
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    InstructorId = table.Column<int>(type: "int", nullable: true)
+                    InstructorId = table.Column<int>(type: "int", nullable: true),
+                    ExtraFeeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

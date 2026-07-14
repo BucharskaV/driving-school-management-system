@@ -18,7 +18,7 @@ public class EnrollmentService : IEnrollmentService
         _enrollmentRepository = enrollmentRepository;
     }
 
-    public async Task EnrollStudentInCourseAsync(int courseId, int studentId, CancellationToken cancellationToken = default)
+    public async Task EnrollStudentInCourseAsync(int courseId, int studentId, CancellationToken cancellationToken)
     {
         var course = await _courseRepository.GetByIdAsync(courseId, cancellationToken);
         if (course is null)

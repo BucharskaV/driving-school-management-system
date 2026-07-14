@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Interfaces;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,22 @@ public class LessonRepository(ApplicationDbContext context) : ILessonRepository
     {
         return await context.Lessons
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+    }
+
+    public async Task<TheoreticalLesson?> GetTheoreticalLessonByIdAsync(int lessonId, CancellationToken cancellationToken = default)
+    {
+        return await context.Lessons
+            .OfType<TheoreticalLesson>()
+            .FirstOrDefaultAsync(l => l.Id == lessonId, cancellationToken);
+    }
+
+    public async Task<PracticalLesson?> GetPracticalLessonByIdAsync(int lessonId, CancellationToken cancellationToken = default)
+    {
+        return await context.Lessons
+            .OfType<PracticalLesson>()
+            .Include(l => l.Car)
+            .Include(l => l.StartLocation)
+            .FirstOrDefaultAsync(l => l.Id == lessonId, cancellationToken);
     }
 
     public async Task<List<Lesson>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -35,5 +52,36 @@ public class LessonRepository(ApplicationDbContext context) : ILessonRepository
     {
         context.Lessons.Remove(lesson);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<LessonType> GetLessonTypeAsync(int lessonId, CancellationToken cancellationToken = default)
+    {
+        var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == lessonId, cancellationToken);
+        return lesson switch
+        {
+            PracticalLesson => LessonType.Practical,
+            TheoreticalLesson => LessonType.Theoretical,
+            _ => throw new Exception("Unknown")
+        };
+    }
+
+    public async Task<bool> IsLessonOfflineAsync(int lessonId, CancellationToken cancellationToken = default)
+    {
+        return await context.Lessons
+            .OfType<TheoreticalLesson>()
+            .Where(l => l.Id == lessonId)
+            .Select(l => !l.IsOnline)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsRoomAvailableAsync(string roomNumber, DateTime start, DateTime end, CancellationToken cancellationToken = default)
+    {
+        return !await context.LessonProgresses
+            .Where(lp => lp.Lesson is TheoreticalLesson)
+            .AnyAsync(lp =>
+                ((TheoreticalLesson)lp.Lesson).RoomNumber == roomNumber &&
+                lp.ProgressStatus == ProgressStatus.Booked &&
+                lp.StartTime < end && lp.EndTime > start,
+                cancellationToken);
     }
 }

@@ -16,6 +16,7 @@ public class ExceptionMiddleware
         [typeof(CategoryNotFoundException)] = HttpStatusCode.NotFound,
         [typeof(StudentNotFoundException)] = HttpStatusCode.NotFound,
         [typeof(CourseNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(LessonNotFoundException)] = HttpStatusCode.NotFound,
     };
  
     private readonly RequestDelegate _next;

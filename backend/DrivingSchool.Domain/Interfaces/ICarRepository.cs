@@ -9,4 +9,5 @@ public interface ICarRepository
     Task AddAsync(Car car, CancellationToken cancellationToken = default);
     Task UpdateAsync(Car car, CancellationToken cancellationToken = default);
     Task DeleteAsync(Car car, CancellationToken cancellationToken = default);
+    Task<bool> IsCarAvailableAsync(int carId, DateTime start, DateTime end, CancellationToken cancellationToken = default);
 }

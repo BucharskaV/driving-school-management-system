@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DrivingSchool.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260711153239_InitialDatabaseMigrationWithInsertedData")]
-    partial class InitialDatabaseMigrationWithInsertedData
+    [Migration("20260714181544_InitialDatabaseMigrationImproved")]
+    partial class InitialDatabaseMigrationImproved
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -280,7 +280,7 @@ namespace DrivingSchool.Infrastructure.Migrations
                     b.HasIndex("LessonId", "InstructorCode")
                         .IsUnique();
 
-                    b.ToTable("LessonInstructors");
+                    b.ToTable("LessonInstructors", (string)null);
                 });
 
             modelBuilder.Entity("DrivingSchool.Domain.Models.LessonProgress", b =>
@@ -293,6 +293,9 @@ namespace DrivingSchool.Infrastructure.Migrations
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExtraFeeId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("InstructorId")
                         .HasColumnType("int");

@@ -277,7 +277,7 @@ namespace DrivingSchool.Infrastructure.Migrations
                     b.HasIndex("LessonId", "InstructorCode")
                         .IsUnique();
 
-                    b.ToTable("LessonInstructors");
+                    b.ToTable("LessonInstructors", (string)null);
                 });
 
             modelBuilder.Entity("DrivingSchool.Domain.Models.LessonProgress", b =>
@@ -290,6 +290,9 @@ namespace DrivingSchool.Infrastructure.Migrations
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExtraFeeId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("InstructorId")
                         .HasColumnType("int");

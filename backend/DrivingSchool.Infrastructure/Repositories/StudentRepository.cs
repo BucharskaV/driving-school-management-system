@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Interfaces;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -35,5 +36,14 @@ public class StudentRepository(ApplicationDbContext context) : IStudentRepositor
     {
         context.Users.Remove(student);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsStudentAvailable(int studentId, DateTime start, DateTime end, CancellationToken cancellationToken = default)
+    {
+        return !await context.LessonProgresses
+            .AnyAsync(lp => lp.StudentId == studentId && 
+                            lp.ProgressStatus == ProgressStatus.Booked &&
+                            lp.StartTime < end && lp.EndTime > start, 
+                cancellationToken);
     }
 }
