@@ -8,3 +8,19 @@ public class LessonNotFoundException : LessonException
 {
     public LessonNotFoundException(int id) : base($"Lesson with ID {id} was not found.") { }
 }
+public class LessonIsRequiredException : LessonException
+{
+    public LessonIsRequiredException() : base($"Lesson is required to proceed.") { }
+}
+public class ProgressNotFoundException : LessonException
+{
+    public ProgressNotFoundException() : base($"Progress was not found.") { }
+}
+public class CarUnavailableException : LessonException
+{
+    public CarUnavailableException() : base($"Car is unavailable during selected timeslot.") { }
+}
+public class RoomUnavailableException : LessonException
+{
+    public RoomUnavailableException() : base($"Car is unavailable during selected timeslot.") { }
+}

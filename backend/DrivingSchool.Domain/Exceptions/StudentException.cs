@@ -9,3 +9,7 @@ public class StudentNotFoundException : StudentException
 {
     public StudentNotFoundException(int id) : base($"Student with ID {id} was not found.") { }
 }
+public class StudentUnavailableException : StudentException
+{
+    public StudentUnavailableException() : base($"Student is unavailable during selected timeslot.") { }
+}

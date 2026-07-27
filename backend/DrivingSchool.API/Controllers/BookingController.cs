@@ -19,12 +19,24 @@ public class BookingController : ControllerBase
     [HttpGet("availability")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ValidateAvailabilityForBooking([FromQuery] ValidateAvailabilityRequest request, CancellationToken cancellationToken)
     {
         var status = await _lessonService.ValidateAvailabilityAsync(request, cancellationToken);
 
         return Ok(new ValidateAvailabilityResponse(status.ToString()));
+    }
+    
+    [HttpPut("book")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> BookLesson([FromBody] BookLessonRequest request, CancellationToken cancellationToken)
+    {
+        await _lessonService.BookLessonAsync(request, cancellationToken);
+
+        return Ok();
     }
 }
