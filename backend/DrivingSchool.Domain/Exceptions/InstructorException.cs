@@ -8,3 +8,7 @@ public class InstructorNotFoundException : InstructorException
 {
     public InstructorNotFoundException() : base($"Instructor not found.") { }
 }
+public class SpecializationNotFoundException : InstructorException
+{
+    public SpecializationNotFoundException() : base($"Specialization not found.") { }
+}

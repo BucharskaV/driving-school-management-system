@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Interfaces;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,54 @@ public class InstructorRepository(ApplicationDbContext context) : IInstructorRep
             .Include(i => i.Specializations)
             .Include(i => i.Certifications)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Instructor>> GetInstructorsByLessonIdAsync(int lessonId, CancellationToken cancellationToken = default)
+    {
+        return await context.LessonInstructors
+            .Where(l => l.LessonId == lessonId)
+            .Select(li => li.Instructor)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Instructor>> GetAvailableInstructorsByLessonIdAsync(DateTime start, DateTime end, int lessonId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.LessonInstructors
+            .Where(li => li.LessonId == lessonId)
+            .Select(li => li.Instructor)
+            .Where(i => !context.LessonProgresses.Any(lp =>
+                lp.InstructorId == i.Id &&
+                lp.ProgressStatus == ProgressStatus.Booked &&
+                lp.StartTime < end &&
+                lp.EndTime > start))
+            .ToListAsync();
+    }
+
+    public async Task<Instructor?> GetRandomAvailableInstructorBySpecializationAsync(DateTime start, DateTime end, InstructorType instructorType,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Users
+            .OfType<Instructor>()
+            .Where(i =>
+                i.Specializations.Any(s => s.Type == instructorType) &&
+                !context.LessonProgresses.Any(lp =>
+                    lp.InstructorId == i.Id &&
+                    lp.ProgressStatus == ProgressStatus.Booked &&
+                    lp.StartTime < end &&
+                    lp.EndTime > start))
+            .OrderBy(_ => Guid.NewGuid())
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsInstructorAvailableAsync(DateTime start, DateTime end, int instructorId,
+        CancellationToken cancellationToken = default)
+    {
+        return !await context.LessonProgresses
+            .AnyAsync(lp =>
+                lp.InstructorId == instructorId &&
+                lp.ProgressStatus == ProgressStatus.Booked &&
+                lp.StartTime < end && lp.EndTime > start, cancellationToken);
     }
 
     public async Task AddAsync(Instructor instructor, CancellationToken cancellationToken = default)
