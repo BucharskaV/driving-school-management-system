@@ -24,3 +24,7 @@ public class RoomUnavailableException : LessonException
 {
     public RoomUnavailableException() : base($"Car is unavailable during selected timeslot.") { }
 }
+public class InvalidNoteException : LessonException
+{
+    public InvalidNoteException() : base($"Note cannot be longer than 200 characters.") { }
+}

@@ -36,6 +36,21 @@ public class LessonRepository(ApplicationDbContext context) : ILessonRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<Lesson>> GetLessonsWithProgressByInstructorIdAsync(int instructorId, CancellationToken cancellationToken = default)
+    {
+        return await context.Lessons
+            .Include(l => l.LessonProgresses
+                .Where(lp => lp.InstructorId == instructorId))
+            .Where(l => l.LessonProgresses.Any(lp => lp.InstructorId == instructorId))
+            .OrderBy(l => l.LessonProgresses
+                .Where(lp => lp.InstructorId == instructorId)
+                .Select(lp => lp.StartTime)
+                .FirstOrDefault())
+            .Include(l => (l as PracticalLesson).Car)
+            .Include(l => (l as PracticalLesson).StartLocation)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task AddAsync(Lesson lesson, CancellationToken cancellationToken = default)
     {
         await context.Lessons.AddAsync(lesson, cancellationToken);

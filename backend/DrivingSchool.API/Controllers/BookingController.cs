@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Services.Contracts.Requests;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Services.Contracts.Requests;
 using DrivingSchool.Services.Contracts.Responses;
 using DrivingSchool.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,17 @@ public class BookingController : ControllerBase
     {
         await _lessonService.BookLessonAsync(request, cancellationToken);
 
+        return Ok();
+    }
+    
+    [HttpPut("status/{studentId:int}/{lessonId:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ChangeBookingStatus(int studentId, int lessonId, ProgressStatus status, CancellationToken cancellationToken)
+    {
+        await _lessonService.ChangeBookingStatusAsync(studentId, lessonId, status, cancellationToken);
         return Ok();
     }
 }

@@ -12,3 +12,7 @@ public class SpecializationNotFoundException : InstructorException
 {
     public SpecializationNotFoundException() : base($"Specialization not found.") { }
 }
+public class PermissionDeniedLockedStatusException : InstructorException
+{
+    public PermissionDeniedLockedStatusException() : base($"Instructor does not have permission to lock lesson.") { }
+}

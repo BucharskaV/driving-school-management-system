@@ -46,4 +46,15 @@ public class InstructorController : ControllerBase
 
         return Ok(instructors);
     }
+    
+    [HttpGet("salary/{instructorId:int}")]
+    [ProducesResponseType(typeof(List<Instructor>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetSalaryInfo(int instructorId, CancellationToken cancellationToken)
+    {
+        var salaryInfo = await _instructorService.GetSalaryInfoAsync(instructorId, cancellationToken);
+
+        return Ok(salaryInfo);
+    }
 }

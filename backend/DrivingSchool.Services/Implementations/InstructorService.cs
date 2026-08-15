@@ -3,6 +3,7 @@ using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests;
+using DrivingSchool.Services.Contracts.Responses;
 using DrivingSchool.Services.Interfaces;
 
 namespace DrivingSchool.Services.Implementations;
@@ -67,5 +68,14 @@ public class InstructorService : IInstructorService
         }
 
         return instructors;
+    }
+
+    public async Task<SalaryInfoResponse> GetSalaryInfoAsync(int instructorId, CancellationToken cancellationToken = default)
+    {
+        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        if (instructor == null)
+            throw new InstructorNotFoundException();
+        
+        return new SalaryInfoResponse(instructor.BaseSalary, instructor.Bonus, instructor.TotalSalary);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Interfaces;
+using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests;
+using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
 
 namespace DrivingSchool.Services.Implementations;
@@ -83,7 +85,88 @@ public class LessonService : ILessonService
         
         await _lessonProgressRepository.UpdateAsync(progress, cancellationToken);
     }
-    
+
+    public async Task<List<LessonDto>> GetLessonsWithProgressByInstructorIdAsync(int instructorId, CancellationToken cancellationToken)
+    {
+        var lessons = await _lessonRepository.GetLessonsWithProgressByInstructorIdAsync(instructorId, cancellationToken);
+        
+        return lessons.Select(lesson => new LessonDto(
+            lesson.Id,
+            lesson.Name,
+            lesson.SequenceNumber,
+            lesson.Duration,
+
+            lesson is PracticalLesson practical && practical.Car != null
+                ? new CarDto(
+                    practical.Car.Id,
+                    practical.Car.Brand,
+                    practical.Car.Model,
+                    practical.Car.RegistrationNumber)
+                : null,
+
+            lesson is PracticalLesson practicalLesson && practicalLesson.StartLocation != null
+                ? new AddressDto(
+                    practicalLesson.StartLocation.Id,
+                    practicalLesson.StartLocation.City,
+                    practicalLesson.StartLocation.District,
+                    practicalLesson.StartLocation.Street,
+                    practicalLesson.StartLocation.HouseNumber)
+                : null,
+
+            lesson is TheoreticalLesson theoretical
+                ? theoretical.Topic
+                : null,
+
+            lesson is TheoreticalLesson theoreticalLesson
+                ? theoreticalLesson.RoomNumber
+                : null,
+
+            lesson is TheoreticalLesson onlineLesson
+                ? onlineLesson.IsOnline
+                : null,
+
+            lesson.LessonProgresses
+                .Where(lp => lp.StudentId == lp.StudentId)
+                .Select(lp => new LessonProgressDto(
+                    lp.StudentId,
+                    lp.LessonId,
+                    lp.ProgressStatus,
+                    lp.StartTime,
+                    lp.EndTime,
+                    lp.Note,
+                    lp.InstructorId,
+                    lp.ExtraFee?.Id))
+                .FirstOrDefault()
+        )).ToList();
+    }
+
+    public async Task AddNoteToLessonAsync(int studentId, int lessonId, string input, CancellationToken cancellationToken)
+    {
+        var progress = await _lessonProgressRepository.GetByIdAsync(studentId, lessonId, cancellationToken);
+        if (progress == null)
+            throw new ProgressNotFoundException();
+        
+        var newNote = progress.Note + $"{Environment.NewLine}"+ input;
+        if(newNote.Length > 200)
+            throw new InvalidNoteException();
+        
+        progress.Note = newNote;
+        await _lessonProgressRepository.UpdateAsync(progress, cancellationToken);
+    }
+
+    public async Task ChangeBookingStatusAsync(int studentId, int lessonId, ProgressStatus status, CancellationToken cancellationToken)
+    {
+        var progress = await _lessonProgressRepository.GetByIdAsync(studentId, lessonId, cancellationToken);
+        if (progress == null)
+            throw new ProgressNotFoundException();
+
+        if (status == ProgressStatus.Locked)
+            throw new PermissionDeniedLockedStatusException();
+         
+        progress.ProgressStatus = status;
+        await _lessonProgressRepository.UpdateAsync(progress, cancellationToken);
+    }
+
     private async Task ValidateAsync(BookLessonRequest request, CancellationToken cancellationToken)
     {
         if (request == null)
