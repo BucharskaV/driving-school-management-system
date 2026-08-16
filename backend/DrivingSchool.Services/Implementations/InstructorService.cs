@@ -3,7 +3,9 @@ using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests;
+using DrivingSchool.Services.Contracts.Requests.Instructor;
 using DrivingSchool.Services.Contracts.Responses;
+using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
 
 namespace DrivingSchool.Services.Implementations;
@@ -77,5 +79,96 @@ public class InstructorService : IInstructorService
             throw new InstructorNotFoundException();
         
         return new SalaryInfoResponse(instructor.BaseSalary, instructor.Bonus, instructor.TotalSalary);
+    }
+
+    public async Task<List<InstructorDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var instructors = await _instructorRepository.GetAllAsync(cancellationToken);
+
+        return instructors
+            .Select(MapToDto)
+            .ToList();
+    }
+
+    public async Task<InstructorDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var instructor = await _instructorRepository.GetByIdAsync(id, cancellationToken);
+        if (instructor == null)
+            throw new InstructorNotFoundException();
+
+        return MapToDto(instructor);
+    }
+
+    public async Task<InstructorDto> CreateAsync(CreateInstructorRequest request, CancellationToken cancellationToken = default)
+    {
+        var instructor = new Instructor(
+            request.Specializations,
+            request.FirstName,
+            request.LastName,
+            Role.Instructor,
+            request.Pesel,
+            request.PhoneNumber,
+            request.Email,
+            request.InstructorCode,
+            request.BaseSalary,
+            request.Bonus,
+            request.DrivingLicenseNumber,
+            request.MedicalCertificateNumber);
+
+        await _instructorRepository
+            .AddAsync(instructor, cancellationToken);
+
+        return MapToDto(instructor);
+    }
+
+    public async Task<InstructorDto> UpdateAsync(int id, UpdateInstructorRequest request, CancellationToken cancellationToken = default)
+    {
+        var instructor = await _instructorRepository.GetByIdAsync(id, cancellationToken);
+        if (instructor == null)
+            throw new InstructorNotFoundException();
+
+        instructor.FirstName = request.FirstName;
+        instructor.LastName = request.LastName;
+        instructor.Email = request.Email;
+        instructor.PhoneNumber = request.PhoneNumber;
+        instructor.BaseSalary = request.BaseSalary;
+        instructor.Bonus = request.Bonus;
+        instructor.DrivingLicenseNumber = request.DrivingLicenseNumber;
+        instructor.MedicalCertificateNumber = request.MedicalCertificateNumber;
+
+        await _instructorRepository
+            .UpdateAsync(instructor, cancellationToken);
+
+        return MapToDto(instructor);
+    }
+
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var instructor = await _instructorRepository.GetByIdAsync(id, cancellationToken);
+        if (instructor == null)
+            throw new InstructorNotFoundException();
+
+        await _instructorRepository
+            .DeleteAsync(instructor, cancellationToken);
+    }
+
+    private static InstructorDto MapToDto(Instructor instructor)
+    {
+        return new InstructorDto(
+            instructor.Id,
+            instructor.FirstName,
+            instructor.LastName,
+            instructor.Pesel,
+            instructor.Email,
+            instructor.PhoneNumber,
+            instructor.InstructorCode,
+            instructor.BaseSalary,
+            instructor.Bonus,
+            instructor.TotalSalary,
+            instructor.DrivingLicenseNumber,
+            instructor.MedicalCertificateNumber,
+            instructor.Specializations
+                .Select(s => s.Type)
+                .ToList());
     }
 }

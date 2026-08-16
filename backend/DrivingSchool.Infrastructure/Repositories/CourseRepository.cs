@@ -10,12 +10,14 @@ public class CourseRepository(ApplicationDbContext context) : ICourseRepository
     public async Task<Course?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await context.Courses
+            .Include(c => c.Category)
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
     }
 
     public async Task<List<Course>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await context.Courses
+            .Include(c => c.Category)
             .ToListAsync(cancellationToken);
     }
 

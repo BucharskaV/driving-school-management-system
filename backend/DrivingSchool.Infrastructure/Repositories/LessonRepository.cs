@@ -41,7 +41,7 @@ public class LessonRepository(ApplicationDbContext context) : ILessonRepository
         return await context.Lessons
             .Include(l => l.LessonProgresses
                 .Where(lp => lp.InstructorId == instructorId))
-            .Where(l => l.LessonProgresses.Any(lp => lp.InstructorId == instructorId))
+            .Where(l => l.LessonProgresses.Any(lp => lp.InstructorId == instructorId && lp.ProgressStatus == ProgressStatus.Booked))
             .OrderBy(l => l.LessonProgresses
                 .Where(lp => lp.InstructorId == instructorId)
                 .Select(lp => lp.StartTime)

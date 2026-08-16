@@ -14,10 +14,10 @@ public class LessonController : ControllerBase
         _lessonService = lessonService;
     }
     
-    [HttpGet("{instructorId:int}")]
+    [HttpGet("instructor/{instructorId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllCoursesByCategoryId(int instructorId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCoursesByInstructorId(int instructorId, CancellationToken cancellationToken)
     {
         var lessons = await _lessonService.GetLessonsWithProgressByInstructorIdAsync(instructorId, cancellationToken);
         return Ok(lessons);

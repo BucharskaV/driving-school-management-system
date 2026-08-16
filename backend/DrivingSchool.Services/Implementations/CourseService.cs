@@ -1,6 +1,7 @@
 ﻿using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
+using DrivingSchool.Services.Contracts.Requests.Course;
 using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
 
@@ -93,5 +94,80 @@ public class CourseService : ICourseService
                 );
             })
         ));
+    }
+
+    public async Task<List<CourseWithCategoryDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var courses = await _courseRepository.GetAllAsync(cancellationToken);
+
+        return courses
+            .Select(MapToDto)
+            .ToList();
+    }
+
+    public async Task<CourseWithCategoryDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var course = await _courseRepository.GetByIdAsync(id, cancellationToken);
+
+        if (course == null)
+            throw new CourseNotFoundException(id);
+
+        return MapToDto(course);
+    }
+
+    public async Task<CourseWithCategoryDto> CreateAsync(CreateCourseRequest request, CancellationToken cancellationToken = default)
+    {
+        var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
+        if (category == null)
+            throw new CategoryNotFoundException(request.CategoryId);
+
+        var course = new Course(
+            category,
+            request.Title,
+            request.Price);
+
+        await _courseRepository
+            .AddAsync(course, cancellationToken);
+
+        return MapToDto(course);
+    }
+
+    public async Task<CourseWithCategoryDto> UpdateAsync(int id, UpdateCourseRequest request, CancellationToken cancellationToken = default)
+    {
+        var course = await _courseRepository.GetByIdAsync(id, cancellationToken);
+        if (course == null)
+            throw new CourseNotFoundException(id);
+
+        var category = await _categoryRepository
+            .GetByIdAsync(request.CategoryId, cancellationToken);
+        if (category == null)
+            throw new CategoryNotFoundException(request.CategoryId);
+
+        course.Title = request.Title;
+        course.Price = request.Price;
+        await _courseRepository
+            .UpdateAsync(course, cancellationToken);
+
+        return MapToDto(course);
+    }
+
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var course = await _courseRepository.GetByIdAsync(id, cancellationToken);
+        if (course == null)
+            throw new CourseNotFoundException(id);
+
+        await _courseRepository
+            .DeleteAsync(course, cancellationToken);
+    }
+
+    private static CourseWithCategoryDto MapToDto(Course course)
+    {
+        return new CourseWithCategoryDto(
+            course.Id,
+            course.Title,
+            course.Price,
+            course.CategoryId,
+            course.Category.Name);
     }
 }
