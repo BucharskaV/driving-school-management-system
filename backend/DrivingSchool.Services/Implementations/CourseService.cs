@@ -31,7 +31,11 @@ public class CourseService : ICourseService
         return courses.Select(course => new CourseDto(
             course.Id,
             course.Title,
-            course.Price
+            course.Price,
+            course.Lessons
+                .OrderBy(l => l.SequenceNumber)
+                .Select(MapLessonToDto)
+                .ToList()
         ));
     }
 
@@ -169,5 +173,53 @@ public class CourseService : ICourseService
             course.Price,
             course.CategoryId,
             course.Category.Name);
+    }
+    private static LessonDto MapLessonToDto(Lesson lesson)
+    {
+        var practical = lesson as PracticalLesson;
+        var theory = lesson as TheoreticalLesson;
+
+        var progress = lesson.LessonProgresses
+            .FirstOrDefault();
+
+        return new LessonDto(
+            lesson.Id,
+            lesson.Name,
+            lesson.SequenceNumber,
+            lesson.Duration,
+
+            practical?.Car is null
+                ? null
+                : new CarDto(
+                    practical.Car.Id,
+                    practical.Car.Brand,
+                    practical.Car.Model,
+                    practical.Car.RegistrationNumber),
+
+            practical?.StartLocation is null
+                ? null
+                : new AddressDto(
+                    practical.StartLocation.Id,
+                    practical.StartLocation.City,
+                    practical.StartLocation.District,
+                    practical.StartLocation.Street,
+                    practical.StartLocation.HouseNumber),
+
+            theory?.Topic,
+            theory?.RoomNumber,
+            theory?.IsOnline,
+
+            progress is null
+                ? null
+                : new LessonProgressDto(
+                    progress.StudentId,
+                    progress.LessonId,
+                    progress.ProgressStatus,
+                    progress.StartTime,
+                    progress.EndTime,
+                    progress.Note,
+                    progress.InstructorId,
+                    progress.ExtraFee?.Id)
+        );
     }
 }

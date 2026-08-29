@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Interfaces;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Interfaces;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -46,5 +47,29 @@ public class LessonProgressRepository(ApplicationDbContext context) : ILessonPro
     {
         context.LessonProgresses.Remove(lessonProgress);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<List<LessonProgress>> GetByInstructorIdAsync(int instructorId, CancellationToken cancellationToken = default)
+    {
+        return await context.LessonProgresses
+            .Include(lp => lp.Student)
+            .Include(lp => lp.Lesson)
+            .Include(lp => lp.Instructor)
+            .Include(lp => lp.ExtraFee)
+            .Where(lp => lp.InstructorId == instructorId && lp.ProgressStatus == ProgressStatus.Booked)
+            .OrderBy(lp => lp.StartTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<LessonProgress>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
+    {
+        return await context.LessonProgresses
+            .Include(lp => lp.Student)
+            .Include(lp => lp.Lesson)
+            .Include(lp => lp.Instructor)
+            .Include(lp => lp.ExtraFee)
+            .Where(lp => lp.StudentId == studentId && lp.ProgressStatus == ProgressStatus.Booked)
+            .OrderBy(lp => lp.StartTime)
+            .ToListAsync(cancellationToken);
     }
 }

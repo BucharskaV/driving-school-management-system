@@ -51,4 +51,26 @@ public class BookingController : ControllerBase
         await _lessonService.ChangeBookingStatusAsync(studentId, lessonId, status, cancellationToken);
         return Ok();
     }
+    
+    [HttpGet("instructor/{instructorId:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetBookingsByInstructor(int instructorId, CancellationToken cancellationToken)
+    {
+        var bookings = await _lessonService.GetBookingsByInstructorIdAsync(instructorId, cancellationToken);
+
+        return Ok(bookings);
+    }
+
+    [HttpGet("student/{studentId:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetBookingsByStudent(int studentId, CancellationToken cancellationToken)
+    {
+        var bookings = await _lessonService.GetBookingsByStudentIdAsync(studentId, cancellationToken);
+
+        return Ok(bookings);
+    }
 }

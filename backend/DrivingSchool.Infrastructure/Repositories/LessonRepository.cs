@@ -11,6 +11,9 @@ public class LessonRepository(ApplicationDbContext context) : ILessonRepository
     public async Task<Lesson?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await context.Lessons
+            .Include(l => l.LessonProgresses)
+            .Include(l => ((PracticalLesson)l).Car)
+            .Include(l => ((PracticalLesson)l).StartLocation)
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
     }
 
@@ -33,6 +36,9 @@ public class LessonRepository(ApplicationDbContext context) : ILessonRepository
     public async Task<List<Lesson>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await context.Lessons
+            .Include(l => l.LessonProgresses)
+            .Include(l => ((PracticalLesson)l).Car)
+            .Include(l => ((PracticalLesson)l).StartLocation)
             .ToListAsync(cancellationToken);
     }
 

@@ -17,3 +17,12 @@ public record InstructorDto(
     string? MedicalCertificateNumber,
     List<InstructorType> Specializations
 );
+
+public record InstructorSpecializationDto(
+    InstructorType Type
+);
+
+public record CertificationDto(
+    int Id,
+    string Description
+);

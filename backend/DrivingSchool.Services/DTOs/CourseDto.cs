@@ -3,5 +3,6 @@
 public record CourseDto(
     int Id,
     string Title,
-    decimal Price
+    decimal Price,
+    List<LessonDto> Lessons
 );

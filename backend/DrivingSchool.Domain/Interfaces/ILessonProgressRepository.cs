@@ -9,4 +9,6 @@ public interface ILessonProgressRepository
     Task AddAsync(LessonProgress lessonProgress, CancellationToken cancellationToken = default);
     Task UpdateAsync(LessonProgress lessonProgress, CancellationToken cancellationToken = default);
     Task DeleteAsync(LessonProgress lessonProgress, CancellationToken cancellationToken = default);
+    Task<List<LessonProgress>> GetByInstructorIdAsync(int instructorId, CancellationToken cancellationToken = default);
+    Task<List<LessonProgress>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default);
 }

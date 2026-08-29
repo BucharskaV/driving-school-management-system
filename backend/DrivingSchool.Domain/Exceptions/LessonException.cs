@@ -28,3 +28,7 @@ public class InvalidNoteException : LessonException
 {
     public InvalidNoteException() : base($"Note cannot be longer than 200 characters.") { }
 }
+public class AddressNotFoundException : LessonException
+{
+    public AddressNotFoundException(int id) : base($"Address was not found.") { }
+}

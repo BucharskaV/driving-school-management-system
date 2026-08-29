@@ -18,6 +18,7 @@ public class CourseRepository(ApplicationDbContext context) : ICourseRepository
     {
         return await context.Courses
             .Include(c => c.Category)
+            .Include(c => c.Lessons)
             .ToListAsync(cancellationToken);
     }
 

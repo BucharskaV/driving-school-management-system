@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Models;
+﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests;
 using DrivingSchool.Services.Contracts.Requests.Instructor;
 using DrivingSchool.Services.Interfaces;
@@ -113,6 +114,81 @@ public class InstructorController : ControllerBase
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         await _instructorService.DeleteAsync(id, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [HttpGet("{instructorId:int}/specializations")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetSpecializations(int instructorId, CancellationToken cancellationToken)
+    {
+        var specializations = await _instructorService.GetSpecializationsAsync(instructorId, cancellationToken);
+
+        return Ok(specializations);
+    }
+    
+    [HttpGet("{instructorId:int}/certifications")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCertifications(int instructorId, CancellationToken cancellationToken)
+    {
+        var certifications = await _instructorService.GetCertificationsAsync(instructorId, cancellationToken);
+
+        return Ok(certifications);
+    }
+    
+    [HttpPost("{instructorId:int}/specializations/practical")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddPracticalSpecialization(int instructorId, [FromBody] AddPracticalSpecializationRequest request, CancellationToken cancellationToken)
+    {
+        await _instructorService.AddPracticalSpecializationAsync(instructorId, request, cancellationToken);
+
+        return Ok();
+    }
+    
+    [HttpPost("{instructorId:int}/specializations/theoretical")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddTheoreticalSpecialization(int instructorId, CancellationToken cancellationToken)
+    {
+        await _instructorService.AddTheoreticalSpecializationAsync(instructorId, cancellationToken);
+
+        return Ok();
+    }
+    
+    [HttpDelete("{instructorId:int}/specializations/{type}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveSpecialization(int instructorId, InstructorType type, CancellationToken cancellationToken)
+    {
+        await _instructorService.RemoveSpecializationAsync(instructorId, type, cancellationToken);
+
+        return NoContent();
+    }
+    
+    [HttpPost("{instructorId:int}/certifications")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddCertification(int instructorId, [FromBody] AddCertificationRequest request, CancellationToken cancellationToken)
+    {
+        var certification = await _instructorService.AddCertificationAsync(instructorId, request, cancellationToken);
+
+        return Ok(certification);
+    }
+    
+    [HttpDelete("{instructorId:int}/certifications/{certificationId:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveCertification(int instructorId, int certificationId, CancellationToken cancellationToken)
+    {
+        await _instructorService.RemoveCertificationAsync(instructorId, certificationId, cancellationToken);
 
         return NoContent();
     }

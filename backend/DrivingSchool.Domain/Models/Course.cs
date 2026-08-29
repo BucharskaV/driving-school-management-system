@@ -7,7 +7,6 @@ public class Course
     public decimal Price { get; set; }
     public int CategoryId { get; private init; }
     public virtual Category Category { get; private init; }
-    
     public virtual ICollection<Enrollment> Enrollments { get; set; } = [];
     public virtual ICollection<Lesson> Lessons { get; set; } = [];
     
