@@ -9,18 +9,11 @@ using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
-public class StudentService : IStudentService
+public class StudentService(IStudentRepository studentRepository) : IStudentService
 {
-    private readonly IStudentRepository _studentRepository;
-
-    public StudentService(IStudentRepository studentRepository)
-    {
-        _studentRepository = studentRepository;
-    }
-
     public async Task<List<StudentDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var students = await _studentRepository.GetAllAsync(cancellationToken);
+        var students = await studentRepository.GetAllAsync(cancellationToken);
 
         return students
             .Select(StudentMapper.MapToDto)
@@ -29,7 +22,7 @@ public class StudentService : IStudentService
 
     public async Task<StudentDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var student = await _studentRepository.GetByIdAsync(id, cancellationToken);
+        var student = await studentRepository.GetByIdAsync(id, cancellationToken);
         if (student == null)
             throw new StudentNotFoundException(id);
 
@@ -40,14 +33,14 @@ public class StudentService : IStudentService
     {
         var student = StudentMapper.MapToEntity(request);
 
-        await _studentRepository.AddAsync(student, cancellationToken);
+        await studentRepository.AddAsync(student, cancellationToken);
 
         return StudentMapper.MapToDto(student);
     }
 
     public async Task<StudentDto> UpdateAsync(int id, UpdateStudentRequest request, CancellationToken cancellationToken = default)
     {
-        var student = await _studentRepository.GetByIdAsync(id, cancellationToken);
+        var student = await studentRepository.GetByIdAsync(id, cancellationToken);
         if (student == null)
             throw new StudentNotFoundException(id);
 
@@ -57,17 +50,17 @@ public class StudentService : IStudentService
         student.Email = request.Email;
         student.DateOfBirth = request.DateOfBirth;
 
-        await _studentRepository.UpdateAsync(student, cancellationToken);
+        await studentRepository.UpdateAsync(student, cancellationToken);
 
         return StudentMapper.MapToDto(student);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var student = await _studentRepository.GetByIdAsync(id, cancellationToken);
+        var student = await studentRepository.GetByIdAsync(id, cancellationToken);
         if (student == null)
             throw new StudentNotFoundException(id);
 
-        await _studentRepository.DeleteAsync(student, cancellationToken);
+        await studentRepository.DeleteAsync(student, cancellationToken);
     }
 }

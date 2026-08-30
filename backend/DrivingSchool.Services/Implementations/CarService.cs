@@ -8,18 +8,11 @@ using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
-public class CarService : ICarService
+public class CarService(ICarRepository carRepository) : ICarService
 {
-    private readonly ICarRepository _carRepository;
-
-    public CarService(ICarRepository carRepository)
-    {
-        _carRepository = carRepository;
-    }
-
     public async Task<List<CarDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var cars = await _carRepository.GetAllAsync(cancellationToken);
+        var cars = await carRepository.GetAllAsync(cancellationToken);
 
         return cars
             .Select(CarMapper.MapToDto)
@@ -28,7 +21,7 @@ public class CarService : ICarService
 
     public async Task<CarDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var car = await _carRepository.GetByIdAsync(id, cancellationToken);
+        var car = await carRepository.GetByIdAsync(id, cancellationToken);
         if (car == null)
             throw new CarNotFoundException(id);
 
@@ -42,29 +35,29 @@ public class CarService : ICarService
             request.Model,
             request.RegistrationNumber);
 
-        await _carRepository.AddAsync(car, cancellationToken);
+        await carRepository.AddAsync(car, cancellationToken);
 
         return CarMapper.MapToDto(car);
     }
 
     public async Task<CarDto> UpdateAsync(int id, UpdateCarRequest request, CancellationToken cancellationToken = default)
     {
-        var car = await _carRepository.GetByIdAsync(id, cancellationToken);
+        var car = await carRepository.GetByIdAsync(id, cancellationToken);
         if (car == null)
             throw new CarNotFoundException(id);
 
         car.RegistrationNumber = request.RegistrationNumber;
-        await _carRepository.UpdateAsync(car, cancellationToken);
+        await carRepository.UpdateAsync(car, cancellationToken);
 
         return CarMapper.MapToDto(car);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var car = await _carRepository.GetByIdAsync(id, cancellationToken);
+        var car = await carRepository.GetByIdAsync(id, cancellationToken);
         if (car == null)
             throw new CarNotFoundException(id);
 
-        await _carRepository.DeleteAsync(car, cancellationToken);
+        await carRepository.DeleteAsync(car, cancellationToken);
     }
 }

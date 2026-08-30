@@ -11,26 +11,18 @@ using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
-public class InstructorService : IInstructorService
+public class InstructorService(IInstructorRepository instructorRepository, ILessonRepository lessonRepository)
+    : IInstructorService
 {
-    private readonly IInstructorRepository _instructorRepository;
-    private readonly ILessonRepository _lessonRepository;
-
-    public InstructorService(IInstructorRepository instructorRepository, ILessonRepository lessonRepository)
-    {
-        _instructorRepository = instructorRepository;
-        _lessonRepository = lessonRepository;
-    }
-
     public async Task<List<Instructor>> GetInstructorsByLessonIdAsync(int lessonId, CancellationToken cancellationToken = default)
     {
-        return await _instructorRepository.GetInstructorsByLessonIdAsync(lessonId, cancellationToken);
+        return await instructorRepository.GetInstructorsByLessonIdAsync(lessonId, cancellationToken);
     }
 
     public async Task<bool> ValidateAvailabilityAsync(ValidateInstructorAvailabilityRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _instructorRepository.IsInstructorAvailableAsync(
+        return await instructorRepository.IsInstructorAvailableAsync(
             request.Start,
             request.End,
             request.InstructorId,
@@ -40,7 +32,7 @@ public class InstructorService : IInstructorService
     public async Task<List<Instructor>> GetAvailableInstructorsAsync(GetAvailableInstructorsRequest request,
         CancellationToken cancellationToken = default)
     {
-        var instructors = await _instructorRepository.GetAvailableInstructorsByLessonIdAsync(
+        var instructors = await instructorRepository.GetAvailableInstructorsByLessonIdAsync(
             request.Start,
             request.End,
             request.LessonId,
@@ -48,7 +40,7 @@ public class InstructorService : IInstructorService
 
         if (instructors.Count == 0)
         {
-            var type = await _lessonRepository.GetLessonTypeAsync(
+            var type = await lessonRepository.GetLessonTypeAsync(
                 request.LessonId,
                 cancellationToken);
 
@@ -60,7 +52,7 @@ public class InstructorService : IInstructorService
             };
 
             var randomInstructor =
-                await _instructorRepository.GetRandomAvailableInstructorBySpecializationAsync(
+                await instructorRepository.GetRandomAvailableInstructorBySpecializationAsync(
                     request.Start,
                     request.End,
                     specialization,
@@ -75,7 +67,7 @@ public class InstructorService : IInstructorService
 
     public async Task<SalaryInfoResponse> GetSalaryInfoAsync(int instructorId, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
         
@@ -84,7 +76,7 @@ public class InstructorService : IInstructorService
 
     public async Task<List<InstructorDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var instructors = await _instructorRepository.GetAllAsync(cancellationToken);
+        var instructors = await instructorRepository.GetAllAsync(cancellationToken);
 
         return instructors
             .Select(InstructorMapper.MapToDto)
@@ -93,7 +85,7 @@ public class InstructorService : IInstructorService
 
     public async Task<InstructorDto> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(id, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(id, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
@@ -104,14 +96,14 @@ public class InstructorService : IInstructorService
     {
         var instructor = InstructorMapper.MapToEntity(request);
 
-        await _instructorRepository.AddAsync(instructor, cancellationToken);
+        await instructorRepository.AddAsync(instructor, cancellationToken);
 
         return InstructorMapper.MapToDto(instructor);
     }
 
     public async Task<InstructorDto> UpdateAsync(int id, UpdateInstructorRequest request, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(id, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(id, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
@@ -124,7 +116,7 @@ public class InstructorService : IInstructorService
         instructor.DrivingLicenseNumber = request.DrivingLicenseNumber;
         instructor.MedicalCertificateNumber = request.MedicalCertificateNumber;
 
-        await _instructorRepository
+        await instructorRepository
             .UpdateAsync(instructor, cancellationToken);
 
         return InstructorMapper.MapToDto(instructor);
@@ -132,17 +124,17 @@ public class InstructorService : IInstructorService
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(id, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(id, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
-        await _instructorRepository
+        await instructorRepository
             .DeleteAsync(instructor, cancellationToken);
     }
     
     public async Task<List<InstructorSpecializationDto>> GetSpecializationsAsync(int instructorId, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
@@ -153,7 +145,7 @@ public class InstructorService : IInstructorService
     
     public async Task<List<CertificationDto>> GetCertificationsAsync(int instructorId, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
@@ -164,56 +156,56 @@ public class InstructorService : IInstructorService
     
     public async Task AddPracticalSpecializationAsync(int instructorId, AddPracticalSpecializationRequest request, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
 
         if (instructor == null)
             throw new InstructorNotFoundException();
 
         instructor.AddPracticalSpecialization(request.DrivingLicenseNumber, request.MedicalCertificateNumber);
-        await _instructorRepository.UpdateAsync(instructor, cancellationToken);
+        await instructorRepository.UpdateAsync(instructor, cancellationToken);
     }
     
     public async Task AddTheoreticalSpecializationAsync(int instructorId, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
         instructor.AddTheoreticalSpecialization();
-        await _instructorRepository.UpdateAsync(instructor, cancellationToken);
+        await instructorRepository.UpdateAsync(instructor, cancellationToken);
     }
     
     public async Task RemoveSpecializationAsync(int instructorId, InstructorType type, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
         instructor.RemoveSpecialization(type);
-        await _instructorRepository.UpdateAsync(instructor, cancellationToken);
+        await instructorRepository.UpdateAsync(instructor, cancellationToken);
     }
     
     public async Task<CertificationDto> AddCertificationAsync(int instructorId, AddCertificationRequest request, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
         var certification = instructor.AddCertification(request.Description);
 
-        await _instructorRepository.UpdateAsync(instructor, cancellationToken);
+        await instructorRepository.UpdateAsync(instructor, cancellationToken);
 
         return new CertificationDto(certification.Id, certification.Description);
     }
     
     public async Task RemoveCertificationAsync(int instructorId, int certificationId, CancellationToken cancellationToken = default)
     {
-        var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
+        var instructor = await instructorRepository.GetByIdAsync(instructorId, cancellationToken);
         if (instructor == null)
             throw new InstructorNotFoundException();
 
         instructor.RemoveCertification(certificationId);
 
-        await _instructorRepository.UpdateAsync(instructor, cancellationToken);
+        await instructorRepository.UpdateAsync(instructor, cancellationToken);
     }
 }
