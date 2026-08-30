@@ -44,7 +44,7 @@ public class BookingController : ControllerBase
     [HttpPut("status/{studentId:int}/{lessonId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ChangeBookingStatus(int studentId, int lessonId, ProgressStatus status, CancellationToken cancellationToken)
     {

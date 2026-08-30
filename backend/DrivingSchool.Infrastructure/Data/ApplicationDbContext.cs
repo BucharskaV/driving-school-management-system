@@ -1,9 +1,10 @@
-﻿using DrivingSchool.Domain.Models;
+﻿using DrivingSchool.Domain.Interfaces;
+using DrivingSchool.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Infrastructure.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : DbContext, IUnitOfWork
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     public DbSet<Address> Addresses { get; set; }
@@ -18,6 +19,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<ExtraFee> ExtraFees { get; set; }
     public DbSet<LessonInstructor> LessonInstructors { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserCredential> UserCredentials => Set<UserCredential>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

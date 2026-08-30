@@ -11,12 +11,28 @@ public class ExceptionMiddleware
     private static readonly IReadOnlyDictionary<Type, HttpStatusCode> StatusCodeMap = new Dictionary<Type, HttpStatusCode>
     {
         [typeof(DuplicateEnrollmentException)] = HttpStatusCode.BadRequest,
-        
+        [typeof(LessonIsRequiredException)] = HttpStatusCode.BadRequest,
+        [typeof(CarUnavailableException)] = HttpStatusCode.BadRequest,
+        [typeof(RoomUnavailableException)] = HttpStatusCode.BadRequest,
+        [typeof(InvalidNoteException)] = HttpStatusCode.BadRequest,
+        [typeof(InvalidRequestException)] = HttpStatusCode.BadRequest,
+        [typeof(StudentUnavailableException)] = HttpStatusCode.BadRequest,
+        [typeof(TimeIsRequiredException)] = HttpStatusCode.BadRequest,
+        [typeof(StartTimeIsInPastException)] = HttpStatusCode.BadRequest,
+        [typeof(OfficeHoursException)] = HttpStatusCode.BadRequest,
+
+        [typeof(PermissionDeniedLockedStatusException)] = HttpStatusCode.Forbidden,
+
         [typeof(ArgumentNullException)] = HttpStatusCode.NotFound,
+        [typeof(CarNotFoundException)] = HttpStatusCode.NotFound,
         [typeof(CategoryNotFoundException)] = HttpStatusCode.NotFound,
-        [typeof(StudentNotFoundException)] = HttpStatusCode.NotFound,
         [typeof(CourseNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(InstructorNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(SpecializationNotFoundException)] = HttpStatusCode.NotFound,
         [typeof(LessonNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(ProgressNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(AddressNotFoundException)] = HttpStatusCode.NotFound,
+        [typeof(StudentNotFoundException)] = HttpStatusCode.NotFound,
     };
  
     private readonly RequestDelegate _next;

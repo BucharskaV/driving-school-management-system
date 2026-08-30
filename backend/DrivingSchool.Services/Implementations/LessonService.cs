@@ -19,11 +19,12 @@ public class LessonService : ILessonService
     private readonly IInstructorRepository _instructorRepository;
     private readonly IAddressRepository _addressRepository;
     private readonly ICourseRepository _courseRepository;
+    private readonly ITimeService _timeService;
 
     public LessonService(IStudentRepository studentRepository, ILessonRepository lessonRepository, 
         ICarRepository carRepository, ILessonProgressRepository lessonProgressRepository,
         IInstructorRepository instructorRepository, IAddressRepository addressRepository,
-        ICourseRepository courseRepository)
+        ICourseRepository courseRepository, ITimeService timeService)
     {
         _studentRepository = studentRepository;
         _lessonRepository = lessonRepository;
@@ -32,6 +33,7 @@ public class LessonService : ILessonService
         _instructorRepository = instructorRepository;
         _addressRepository = addressRepository;
         _courseRepository = courseRepository;
+        _timeService = timeService;
     }
     
     public async Task<List<LessonDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -282,21 +284,7 @@ public class LessonService : ILessonService
             };
         }
         
-        IsInOfficeHours(request.StartTime, request.EndTime);
-    }
-
-    private void IsInOfficeHours(DateTime start, DateTime end)
-    {
-        var startLocal = start.ToLocalTime();
-        var endLocal = end.ToLocalTime();
-        if (startLocal < DateTime.Now)
-            throw new StartTimeIsInPastException();
-        
-        var openingTime = TimeSpan.FromHours(8);  
-        var closingTime = TimeSpan.FromHours(20);
-
-        if(startLocal.TimeOfDay <= openingTime || endLocal.TimeOfDay >= closingTime)
-            throw new OfficeHoursException(openingTime, closingTime);
+        _timeService.IsWithinOfficeHours(request.StartTime, request.EndTime);
     }
     
     public async Task<List<BookingDto>> GetBookingsByInstructorIdAsync(int instructorId, CancellationToken cancellationToken = default)

@@ -36,4 +36,40 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
         context.Users.Remove(user);
         await context.SaveChangesAsync(cancellationToken);
     }
+
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default) =>
+        context.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+ 
+    public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default) =>
+        context.Users.AnyAsync(u => u.Email == email, cancellationToken);
+ 
+    public async Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+    {
+        var token = await context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken, cancellationToken);
+ 
+        return token is { IsActive: true } ? token.User : null;
+    }
+ 
+    public async Task AddRefreshTokenAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default) =>
+        await context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
+ 
+    public async Task RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+    {
+        var token = await context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken, cancellationToken);
+ 
+        token?.Revoke();
+    }
+ 
+    public async Task RevokeAllRefreshTokensAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var activeTokens = await context.RefreshTokens
+            .Where(rt => rt.UserId == userId && rt.RevokedAtUtc == null)
+            .ToListAsync(cancellationToken);
+ 
+        foreach (var token in activeTokens)
+            token.Revoke();
+    }
 }
