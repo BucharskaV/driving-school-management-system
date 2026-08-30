@@ -4,6 +4,7 @@ using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests.Course;
 using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
+using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
@@ -28,15 +29,7 @@ public class CourseService : ICourseService
 
         var courses = await _courseRepository.GetCoursesByCategoryIdAsync(categoryId, cancellationToken);
 
-        return courses.Select(course => new CourseDto(
-            course.Id,
-            course.Title,
-            course.Price,
-            course.Lessons
-                .OrderBy(l => l.SequenceNumber)
-                .Select(MapLessonToDto)
-                .ToList()
-        ));
+        return courses.Select(CourseMapper.MapToDto);
     }
 
     public async Task<IEnumerable<EnrolledCourseDto>> GetEnrolledCoursesByStudentIdAsync(int studentId, CancellationToken cancellationToken)
@@ -47,57 +40,9 @@ public class CourseService : ICourseService
 
         var courses = await _courseRepository.GetEnrolledCoursesByStudentIdAsync(studentId, cancellationToken);
 
-        return courses.Select(course => new EnrolledCourseDto(
-            course.Id,
-            course.Title,
-            course.Price,
-            course.Lessons.Select(lesson =>
-            {
-                var progress = lesson.LessonProgresses.FirstOrDefault();
-                var practical = lesson as PracticalLesson;
-                var theory = lesson as TheoreticalLesson;
-
-                return new LessonDto(
-                    lesson.Id,
-                    lesson.Name,
-                    lesson.SequenceNumber,
-                    lesson.Duration,
-
-                    practical is null
-                        ? null
-                        : new CarDto(
-                            practical.Car.Id,
-                            practical.Car.Brand,
-                            practical.Car.Model,
-                            practical.Car.RegistrationNumber),
-
-                    practical is null
-                        ? null
-                        : new AddressDto(
-                            practical.StartLocation.Id,
-                            practical.StartLocation.City,
-                            practical.StartLocation.District,
-                            practical.StartLocation.Street,
-                            practical.StartLocation.HouseNumber),
-
-                    theory?.Topic,
-                    theory?.RoomNumber,
-                    theory?.IsOnline,
-
-                    progress is null
-                        ? null
-                        : new LessonProgressDto(
-                            progress.StudentId,
-                            progress.LessonId,
-                            progress.ProgressStatus,
-                            progress.StartTime,
-                            progress.EndTime,
-                            progress.Note,
-                            progress.InstructorId,
-                            progress.ExtraFee?.Id)
-                );
-            })
-        ));
+        return courses
+            .Select(CourseMapper.MapToEnrolledDto)
+            .ToList();
     }
 
     public async Task<List<CourseWithCategoryDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -105,7 +50,7 @@ public class CourseService : ICourseService
         var courses = await _courseRepository.GetAllAsync(cancellationToken);
 
         return courses
-            .Select(MapToDto)
+            .Select(CourseMapper.MapToDtoWithCategory)
             .ToList();
     }
 
@@ -116,7 +61,7 @@ public class CourseService : ICourseService
         if (course == null)
             throw new CourseNotFoundException(id);
 
-        return MapToDto(course);
+        return CourseMapper.MapToDtoWithCategory(course);
     }
 
     public async Task<CourseWithCategoryDto> CreateAsync(CreateCourseRequest request, CancellationToken cancellationToken = default)
@@ -133,7 +78,7 @@ public class CourseService : ICourseService
         await _courseRepository
             .AddAsync(course, cancellationToken);
 
-        return MapToDto(course);
+        return CourseMapper.MapToDtoWithCategory(course);
     }
 
     public async Task<CourseWithCategoryDto> UpdateAsync(int id, UpdateCourseRequest request, CancellationToken cancellationToken = default)
@@ -149,10 +94,9 @@ public class CourseService : ICourseService
 
         course.Title = request.Title;
         course.Price = request.Price;
-        await _courseRepository
-            .UpdateAsync(course, cancellationToken);
+        await _courseRepository.UpdateAsync(course, cancellationToken);
 
-        return MapToDto(course);
+        return CourseMapper.MapToDtoWithCategory(course);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -161,65 +105,6 @@ public class CourseService : ICourseService
         if (course == null)
             throw new CourseNotFoundException(id);
 
-        await _courseRepository
-            .DeleteAsync(course, cancellationToken);
-    }
-
-    private static CourseWithCategoryDto MapToDto(Course course)
-    {
-        return new CourseWithCategoryDto(
-            course.Id,
-            course.Title,
-            course.Price,
-            course.CategoryId,
-            course.Category.Name);
-    }
-    private static LessonDto MapLessonToDto(Lesson lesson)
-    {
-        var practical = lesson as PracticalLesson;
-        var theory = lesson as TheoreticalLesson;
-
-        var progress = lesson.LessonProgresses
-            .FirstOrDefault();
-
-        return new LessonDto(
-            lesson.Id,
-            lesson.Name,
-            lesson.SequenceNumber,
-            lesson.Duration,
-
-            practical?.Car is null
-                ? null
-                : new CarDto(
-                    practical.Car.Id,
-                    practical.Car.Brand,
-                    practical.Car.Model,
-                    practical.Car.RegistrationNumber),
-
-            practical?.StartLocation is null
-                ? null
-                : new AddressDto(
-                    practical.StartLocation.Id,
-                    practical.StartLocation.City,
-                    practical.StartLocation.District,
-                    practical.StartLocation.Street,
-                    practical.StartLocation.HouseNumber),
-
-            theory?.Topic,
-            theory?.RoomNumber,
-            theory?.IsOnline,
-
-            progress is null
-                ? null
-                : new LessonProgressDto(
-                    progress.StudentId,
-                    progress.LessonId,
-                    progress.ProgressStatus,
-                    progress.StartTime,
-                    progress.EndTime,
-                    progress.Note,
-                    progress.InstructorId,
-                    progress.ExtraFee?.Id)
-        );
+        await _courseRepository.DeleteAsync(course, cancellationToken);
     }
 }

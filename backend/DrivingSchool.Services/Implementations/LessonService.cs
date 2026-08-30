@@ -6,6 +6,7 @@ using DrivingSchool.Services.Contracts.Requests;
 using DrivingSchool.Services.Contracts.Requests.Lesson;
 using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
+using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
@@ -38,7 +39,7 @@ public class LessonService : ILessonService
         var lessons = await _lessonRepository.GetAllAsync(cancellationToken);
 
         return lessons
-            .Select(MapToDto)
+            .Select(LessonMapper.MapToDto)
             .ToList();
     }
 
@@ -48,7 +49,7 @@ public class LessonService : ILessonService
         if (lesson == null)
             throw new LessonNotFoundException(id);
 
-        return MapToDto(lesson);
+        return LessonMapper.MapToDto(lesson);
     }
 
     public async Task<LessonDto> CreatePracticalAsync(CreatePracticalLessonRequest request, CancellationToken cancellationToken = default)
@@ -76,7 +77,7 @@ public class LessonService : ILessonService
 
         await _lessonRepository.AddAsync(lesson, cancellationToken);
 
-        return MapToDto(lesson);
+        return LessonMapper.MapToDto(lesson);
     }
 
     public async Task<LessonDto> CreateTheoreticalAsync(
@@ -98,7 +99,7 @@ public class LessonService : ILessonService
 
         await _lessonRepository.AddAsync(lesson, cancellationToken);
 
-        return MapToDto(lesson);
+        return LessonMapper.MapToDto(lesson);
     }
 
     public async Task<LessonDto> UpdatePracticalAsync(int id, UpdatePracticalLessonRequest request, CancellationToken cancellationToken = default)
@@ -126,7 +127,7 @@ public class LessonService : ILessonService
 
         await _lessonRepository.UpdateAsync(practicalLesson, cancellationToken);
 
-        return MapToDto(practicalLesson);
+        return LessonMapper.MapToDto(practicalLesson);
     }
 
     public async Task<LessonDto> UpdateTheoreticalAsync(int id, UpdateTheoreticalLessonRequest request, CancellationToken cancellationToken = default)
@@ -147,7 +148,7 @@ public class LessonService : ILessonService
 
         await _lessonRepository.UpdateAsync(theoreticalLesson, cancellationToken);
 
-        return MapToDto(theoreticalLesson);
+        return LessonMapper.MapToDto(theoreticalLesson);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -222,54 +223,9 @@ public class LessonService : ILessonService
     {
         var lessons = await _lessonRepository.GetLessonsWithProgressByInstructorIdAsync(instructorId, cancellationToken);
         
-        return lessons.Select(lesson => new LessonDto(
-            lesson.Id,
-            lesson.Name,
-            lesson.SequenceNumber,
-            lesson.Duration,
-
-            lesson is PracticalLesson practical && practical.Car != null
-                ? new CarDto(
-                    practical.Car.Id,
-                    practical.Car.Brand,
-                    practical.Car.Model,
-                    practical.Car.RegistrationNumber)
-                : null,
-
-            lesson is PracticalLesson practicalLesson && practicalLesson.StartLocation != null
-                ? new AddressDto(
-                    practicalLesson.StartLocation.Id,
-                    practicalLesson.StartLocation.City,
-                    practicalLesson.StartLocation.District,
-                    practicalLesson.StartLocation.Street,
-                    practicalLesson.StartLocation.HouseNumber)
-                : null,
-
-            lesson is TheoreticalLesson theoretical
-                ? theoretical.Topic
-                : null,
-
-            lesson is TheoreticalLesson theoreticalLesson
-                ? theoreticalLesson.RoomNumber
-                : null,
-
-            lesson is TheoreticalLesson onlineLesson
-                ? onlineLesson.IsOnline
-                : null,
-
-            lesson.LessonProgresses
-                .Where(lp => lp.StudentId == lp.StudentId)
-                .Select(lp => new LessonProgressDto(
-                    lp.StudentId,
-                    lp.LessonId,
-                    lp.ProgressStatus,
-                    lp.StartTime,
-                    lp.EndTime,
-                    lp.Note,
-                    lp.InstructorId,
-                    lp.ExtraFee?.Id))
-                .FirstOrDefault()
-        )).ToList();
+        return lessons
+            .Select(LessonMapper.MapToDto)
+            .ToList();
     }
 
     public async Task AddNoteToLessonAsync(int studentId, int lessonId, string input, CancellationToken cancellationToken)
@@ -343,55 +299,6 @@ public class LessonService : ILessonService
             throw new OfficeHoursException(openingTime, closingTime);
     }
     
-    private static LessonDto MapToDto(Lesson lesson)
-    {
-        var practical = lesson as PracticalLesson;
-        var theoretical = lesson as TheoreticalLesson;
-
-        var progress = lesson.LessonProgresses
-            .FirstOrDefault();
-
-        return new LessonDto(
-            lesson.Id,
-            lesson.Name,
-            lesson.SequenceNumber,
-            lesson.Duration,
-
-            practical?.Car is null
-                ? null
-                : new CarDto(
-                    practical.Car.Id,
-                    practical.Car.Brand,
-                    practical.Car.Model,
-                    practical.Car.RegistrationNumber),
-
-            practical?.StartLocation is null
-                ? null
-                : new AddressDto(
-                    practical.StartLocation.Id,
-                    practical.StartLocation.City,
-                    practical.StartLocation.District,
-                    practical.StartLocation.Street,
-                    practical.StartLocation.HouseNumber),
-
-            theoretical?.Topic,
-            theoretical?.RoomNumber,
-            theoretical?.IsOnline,
-
-            progress is null
-                ? null
-                : new LessonProgressDto(
-                    progress.StudentId,
-                    progress.LessonId,
-                    progress.ProgressStatus,
-                    progress.StartTime,
-                    progress.EndTime,
-                    progress.Note,
-                    progress.InstructorId,
-                    progress.ExtraFee?.Id)
-        );
-    }
-    
     public async Task<List<BookingDto>> GetBookingsByInstructorIdAsync(int instructorId, CancellationToken cancellationToken = default)
     {
         var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
@@ -401,7 +308,7 @@ public class LessonService : ILessonService
         var bookings = await _lessonProgressRepository.GetByInstructorIdAsync(instructorId, cancellationToken);
 
         return bookings
-            .Select(MapBookingToDto)
+            .Select(BookingMapper.MapToDto)
             .ToList();
     }
     
@@ -414,25 +321,7 @@ public class LessonService : ILessonService
         var bookings = await _lessonProgressRepository.GetByStudentIdAsync(studentId, cancellationToken);
 
         return bookings
-            .Select(MapBookingToDto)
+            .Select(BookingMapper.MapToDto)
             .ToList();
-    }
-    
-    private static BookingDto MapBookingToDto(LessonProgress progress)
-    {
-        return new BookingDto(
-            progress.StudentId,
-            progress.Student.FullName,
-            progress.LessonId,
-            progress.Lesson.Name,
-            progress.Lesson.SequenceNumber,
-            progress.StartTime,
-            progress.EndTime,
-            progress.ProgressStatus,
-            progress.Note,
-            progress.InstructorId,
-            progress.Instructor?.FullName,
-            progress.ExtraFeeId
-        );
     }
 }

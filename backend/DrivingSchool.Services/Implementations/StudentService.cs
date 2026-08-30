@@ -5,6 +5,7 @@ using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests.Student;
 using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
+using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
@@ -22,7 +23,7 @@ public class StudentService : IStudentService
         var students = await _studentRepository.GetAllAsync(cancellationToken);
 
         return students
-            .Select(MapToDto)
+            .Select(StudentMapper.MapToDto)
             .ToList();
     }
 
@@ -32,23 +33,16 @@ public class StudentService : IStudentService
         if (student == null)
             throw new StudentNotFoundException(id);
 
-        return MapToDto(student);
+        return StudentMapper.MapToDto(student);
     }
 
     public async Task<StudentDto> CreateAsync(CreateStudentRequest request, CancellationToken cancellationToken = default)
     {
-        var student = new Student(
-            request.FirstName,
-            request.LastName,
-            request.Pesel,
-            Role.Student,
-            request.PhoneNumber,
-            request.Email,
-            request.DateOfBirth);
+        var student = StudentMapper.MapToEntity(request);
 
         await _studentRepository.AddAsync(student, cancellationToken);
 
-        return MapToDto(student);
+        return StudentMapper.MapToDto(student);
     }
 
     public async Task<StudentDto> UpdateAsync(int id, UpdateStudentRequest request, CancellationToken cancellationToken = default)
@@ -65,7 +59,7 @@ public class StudentService : IStudentService
 
         await _studentRepository.UpdateAsync(student, cancellationToken);
 
-        return MapToDto(student);
+        return StudentMapper.MapToDto(student);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -75,18 +69,5 @@ public class StudentService : IStudentService
             throw new StudentNotFoundException(id);
 
         await _studentRepository.DeleteAsync(student, cancellationToken);
-    }
-
-    private static StudentDto MapToDto(Student student)
-    {
-        return new StudentDto(
-            student.Id,
-            student.FirstName,
-            student.LastName,
-            student.Pesel,
-            student.PhoneNumber,
-            student.Email,
-            student.DateOfBirth,
-            student.Age);
     }
 }

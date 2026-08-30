@@ -25,7 +25,7 @@ public class Student : User
     
     private Student() : base(){}
 
-    public Student(string firstName, string lastName, string pesel, Role role, string phoneNumber, string email, DateTime dateOfBirth) : base(firstName, lastName, role, pesel, phoneNumber, email)
+    public Student(string firstName, string lastName, string pesel, Role role, string phoneNumber, string? email, DateTime dateOfBirth) : base(firstName, lastName, role, pesel, phoneNumber, email)
     {
         DateOfBirth = dateOfBirth;
     }

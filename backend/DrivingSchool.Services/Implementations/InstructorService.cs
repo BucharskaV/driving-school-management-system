@@ -7,6 +7,7 @@ using DrivingSchool.Services.Contracts.Requests.Instructor;
 using DrivingSchool.Services.Contracts.Responses;
 using DrivingSchool.Services.DTOs;
 using DrivingSchool.Services.Interfaces;
+using DrivingSchool.Services.Mappers;
 
 namespace DrivingSchool.Services.Implementations;
 
@@ -86,7 +87,7 @@ public class InstructorService : IInstructorService
         var instructors = await _instructorRepository.GetAllAsync(cancellationToken);
 
         return instructors
-            .Select(MapToDto)
+            .Select(InstructorMapper.MapToDto)
             .ToList();
     }
 
@@ -96,29 +97,16 @@ public class InstructorService : IInstructorService
         if (instructor == null)
             throw new InstructorNotFoundException();
 
-        return MapToDto(instructor);
+        return InstructorMapper.MapToDto(instructor);
     }
 
     public async Task<InstructorDto> CreateAsync(CreateInstructorRequest request, CancellationToken cancellationToken = default)
     {
-        var instructor = new Instructor(
-            request.Specializations,
-            request.FirstName,
-            request.LastName,
-            Role.Instructor,
-            request.Pesel,
-            request.PhoneNumber,
-            request.Email,
-            request.InstructorCode,
-            request.BaseSalary,
-            request.Bonus,
-            request.DrivingLicenseNumber,
-            request.MedicalCertificateNumber);
+        var instructor = InstructorMapper.MapToEntity(request);
 
-        await _instructorRepository
-            .AddAsync(instructor, cancellationToken);
+        await _instructorRepository.AddAsync(instructor, cancellationToken);
 
-        return MapToDto(instructor);
+        return InstructorMapper.MapToDto(instructor);
     }
 
     public async Task<InstructorDto> UpdateAsync(int id, UpdateInstructorRequest request, CancellationToken cancellationToken = default)
@@ -139,7 +127,7 @@ public class InstructorService : IInstructorService
         await _instructorRepository
             .UpdateAsync(instructor, cancellationToken);
 
-        return MapToDto(instructor);
+        return InstructorMapper.MapToDto(instructor);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
@@ -150,26 +138,6 @@ public class InstructorService : IInstructorService
 
         await _instructorRepository
             .DeleteAsync(instructor, cancellationToken);
-    }
-
-    private static InstructorDto MapToDto(Instructor instructor)
-    {
-        return new InstructorDto(
-            instructor.Id,
-            instructor.FirstName,
-            instructor.LastName,
-            instructor.Pesel,
-            instructor.Email,
-            instructor.PhoneNumber,
-            instructor.InstructorCode,
-            instructor.BaseSalary,
-            instructor.Bonus,
-            instructor.TotalSalary,
-            instructor.DrivingLicenseNumber,
-            instructor.MedicalCertificateNumber,
-            instructor.Specializations
-                .Select(s => s.Type)
-                .ToList());
     }
     
     public async Task<List<InstructorSpecializationDto>> GetSpecializationsAsync(int instructorId, CancellationToken cancellationToken = default)
@@ -190,9 +158,7 @@ public class InstructorService : IInstructorService
             throw new InstructorNotFoundException();
 
         return instructor.Certifications
-            .Select(c => new CertificationDto(
-                c.Id,
-                c.Description))
+            .Select(InstructorMapper.MapCertificationToDto)
             .ToList();
     }
     
@@ -230,7 +196,6 @@ public class InstructorService : IInstructorService
     public async Task<CertificationDto> AddCertificationAsync(int instructorId, AddCertificationRequest request, CancellationToken cancellationToken = default)
     {
         var instructor = await _instructorRepository.GetByIdAsync(instructorId, cancellationToken);
-
         if (instructor == null)
             throw new InstructorNotFoundException();
 
