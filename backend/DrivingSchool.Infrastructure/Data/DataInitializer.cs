@@ -1,5 +1,6 @@
 ﻿using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Models;
+using DrivingSchool.Infrastructure.Authentification;
 
 namespace DrivingSchool.Infrastructure.Data;
 
@@ -9,6 +10,12 @@ public static class DataInitializer
     //21.12.2026 14.30(utc)->16.30 booked instructor FirstnameT9 LastnameT9 - TR00009
     //22.12.2026 14.30(utc)->16.30 booked room for offline theoretical lesson Room A1 
     //24.12.2026 14.30(utc)->16.30 booked car for practical lesson 
+    //
+    //test credentials
+    //Student   klara@gmail.com/Student123!
+    //Student   anna@gmail.com/Student123!
+    //Instructor    instructor1@drivingschool.test/Instructor123!
+    //Admin      admin@drivingschool.test/Admin123!
     public static void Initialize(ApplicationDbContext dbContext)
     {
         dbContext.Database.EnsureDeleted();
@@ -307,9 +314,25 @@ public static class DataInitializer
         );
 
         dbContext.Users.Add(specialInstructor);
-
-        var admin = new User("Antonio", "Rolling", Role.Admin, "91009999999", "777890123");
         
+        var admin = new User("Antonio", "Rolling", Role.Admin, "91009999999", "777890123", "admin@drivingschool.test");
+        dbContext.Users.Add(admin);
+ 
+        dbContext.SaveChanges();
+ 
+        var passwordHasher = new PasswordHasher();
+        var testInstructor = instructors[0]; // FirstnameP1 LastnameP1
+        testInstructor.Email = "instructor1@drivingschool.test";
+ 
+        var credentials = new List<UserCredential>
+        {
+            new(students[0], passwordHasher.Hash("Student123!")),
+            new(students[1], passwordHasher.Hash("Student123!")),
+            new(testInstructor, passwordHasher.Hash("Instructor123!")),
+            new(admin, passwordHasher.Hash("Admin123!"))
+        };
+        
+        dbContext.UserCredentials.AddRange(credentials);
         dbContext.SaveChanges();
         
         var availableProgresses = lessonProgresses
