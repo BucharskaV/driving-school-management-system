@@ -1,4 +1,5 @@
 ﻿using DrivingSchool.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrivingSchool.API.Controllers;
@@ -15,6 +16,7 @@ public class EnrollmentController : ControllerBase
     }
     
     [HttpPost("{courseId:int}/{studentId:int}")]
+    [Authorize(Policy = "StudentOnly")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

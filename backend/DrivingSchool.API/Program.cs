@@ -97,9 +97,11 @@ builder.Services.AddAuthentication(options =>
     });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("AdminOnly", policy => policy.RequireRole(nameof(Role.Admin)))
+    .AddPolicy("StudentOnly", policy => policy.RequireRole(nameof(Role.Student)))
     .AddPolicy("InstructorOnly", policy => policy.RequireRole(nameof(Role.Instructor)))
-    .AddPolicy("StudentOnly", policy => policy.RequireRole(nameof(Role.Student)));
+    .AddPolicy("AdminOnly", policy => policy.RequireRole(nameof(Role.Admin)))
+    .AddPolicy("InstructorOrAdmin", policy => policy.RequireRole(nameof(Role.Instructor), nameof(Role.Admin)))
+    .AddPolicy("StudentOrAdmin", policy => policy.RequireRole(nameof(Role.Student), nameof(Role.Admin)));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -125,7 +127,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization(); 
 
 app.MapControllers();
 

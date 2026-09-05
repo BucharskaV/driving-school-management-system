@@ -3,6 +3,7 @@ using DrivingSchool.Domain.Models;
 using DrivingSchool.Services.Contracts.Requests;
 using DrivingSchool.Services.Contracts.Requests.Instructor;
 using DrivingSchool.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrivingSchool.API.Controllers;
@@ -19,6 +20,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpGet("lesson/{lessonId}")]
+    [Authorize(Policy = "StudentOnly")]
     [ProducesResponseType(typeof(List<Instructor>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -30,6 +32,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpGet("availability")]
+    [Authorize(Policy = "StudentOnly")]
     public async Task<IActionResult> ValidateAvailability(
         [FromQuery] ValidateInstructorAvailabilityRequest request,
         CancellationToken cancellationToken)
@@ -40,6 +43,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpGet("available")]
+    [Authorize(Policy = "StudentOnly")]
     public async Task<IActionResult> GetAvailableInstructors(
         [FromQuery] GetAvailableInstructorsRequest request,
         CancellationToken cancellationToken)
@@ -50,6 +54,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpGet("salary/{instructorId:int}")]
+    [Authorize(Policy = "InstructorOnly")]
     [ProducesResponseType(typeof(List<Instructor>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -61,6 +66,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpGet]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -71,6 +77,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -82,6 +89,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -96,6 +104,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -108,6 +117,7 @@ public class InstructorController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -119,6 +129,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpGet("{instructorId:int}/specializations")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSpecializations(int instructorId, CancellationToken cancellationToken)
@@ -129,6 +140,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpGet("{instructorId:int}/certifications")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCertifications(int instructorId, CancellationToken cancellationToken)
@@ -139,6 +151,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpPost("{instructorId:int}/specializations/practical")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -150,6 +163,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpPost("{instructorId:int}/specializations/theoretical")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -161,6 +175,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpDelete("{instructorId:int}/specializations/{type}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -172,6 +187,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpPost("{instructorId:int}/certifications")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -183,6 +199,7 @@ public class InstructorController : ControllerBase
     }
     
     [HttpDelete("{instructorId:int}/certifications/{certificationId:int}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

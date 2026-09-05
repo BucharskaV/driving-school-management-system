@@ -2,6 +2,7 @@
 using DrivingSchool.Services.Contracts.Requests;
 using DrivingSchool.Services.Contracts.Responses;
 using DrivingSchool.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrivingSchool.API.Controllers;
@@ -18,6 +19,7 @@ public class BookingController : ControllerBase
     }
     
     [HttpGet("availability")]
+    [Authorize(Policy = "StudentOnly")] 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -30,6 +32,7 @@ public class BookingController : ControllerBase
     }
     
     [HttpPut("book")]
+    [Authorize(Policy = "StudentOnly")] 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,6 +45,7 @@ public class BookingController : ControllerBase
     }
     
     [HttpPut("status/{studentId:int}/{lessonId:int}")]
+    [Authorize(Policy = "InstructorOnly")] 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -53,6 +57,7 @@ public class BookingController : ControllerBase
     }
     
     [HttpGet("instructor/{instructorId:int}")]
+    [Authorize(Policy = "InstructorOrAdmin")] 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -64,6 +69,7 @@ public class BookingController : ControllerBase
     }
 
     [HttpGet("student/{studentId:int}")]
+    [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
