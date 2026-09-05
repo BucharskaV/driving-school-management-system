@@ -9,7 +9,25 @@ public class LessonInstructor
     public virtual Lesson Lesson { get; private init; }
     public int InstructorId { get; private init; }
     public virtual Instructor Instructor { get; private init; }
-    public string InstructorCode{ get; private init; }
+    
+    private string _instructorCode;
+    public string InstructorCode
+    {
+        get => _instructorCode;
+        init
+        {
+            if(String.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException("Instructor's code cannot be empty");
+            }
+            Regex codeRegex = new Regex("^[A-Z]{2}\\d{5}$");
+            if (!codeRegex.IsMatch(value.Trim()))
+            {
+                throw new ArgumentException("Invalid instructor's code. The format is: 2 uppercase letters followed by 5 digits");
+            }
+            _instructorCode = value.Trim();
+        }
+    }
     
     private LessonInstructor() {}
 

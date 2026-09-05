@@ -9,18 +9,93 @@ public class Instructor : User
     public virtual ICollection<InstructorSpecialization> Specializations{ get; set; } = [];
     
     private string _instructorCode;
-    public string InstructorCode { get; init; }
-    public decimal BaseSalary { get; set; }
-    public decimal? Bonus { get; set; }
+    public string InstructorCode
+    {
+        get => _instructorCode;
+        init
+        {
+            if(String.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException("Instructor's code cannot be empty");
+            }
+            Regex codeRegex = new Regex("^[A-Z]{2}\\d{5}$");
+            if (!codeRegex.IsMatch(value.Trim()))
+            {
+                throw new ArgumentException("Invalid instructor's code. The format is: 2 uppercase letters followed by 5 digits");
+            }
+            _instructorCode = value.Trim();
+        }
+    }
+    
+    private decimal _baseSalary;
+    public decimal BaseSalary
+    {
+        get => _baseSalary;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("Base salary cannot be less than 0");
+            }
+            _baseSalary = value;
+        }
+    }
+    
+    private decimal? _bonus;
+    public decimal? Bonus
+    {
+        get => _bonus;
+        set
+        {
+            if (value != null && value < 0)
+            {
+                throw new ArgumentException("Bonus cannot be less than 0");
+            }
+            _bonus = value;
+        }
+    }
     
     public decimal TotalSalary => BaseSalary + (Bonus ?? 0);
     
     private string? _drivingLicenseNumber;
-    public string? DrivingLicenseNumber { get; set; }
+    public string? DrivingLicenseNumber
+    {
+        get
+        {
+            EnsureType(InstructorType.PracticalInstructor);
+            return _drivingLicenseNumber;
+        }
+        set
+        {
+            EnsureType(InstructorType.PracticalInstructor);
+            Regex codeRegex = new Regex("^[A-Z]{1,2}[0-9A-Z]{6,14}$");
+            if(value != null && !codeRegex.IsMatch(value.Trim()))
+            {
+                throw new ArgumentNullException("Invalid driving license number.");
+            }
+            _drivingLicenseNumber = value?.Trim();
+        }
+    }
     
     private string? _medicalCertificateNumber;
-    public string? MedicalCertificateNumber { get; set; }
-    
+    public string? MedicalCertificateNumber
+    {
+        get
+        {
+            EnsureType(InstructorType.PracticalInstructor);
+            return _medicalCertificateNumber;
+        }
+        set
+        {
+            EnsureType(InstructorType.PracticalInstructor);
+            Regex codeRegex = new Regex("^[0-9]{6,12}$");
+            if(value != null && !codeRegex.IsMatch(value.Trim()))
+            {
+                throw new ArgumentException("Invalid medical certificate number.");
+            }
+            _medicalCertificateNumber = value?.Trim();
+        }
+    }
     public virtual ICollection<LessonProgress> LessonProgresses { get; set; } = [];
     public virtual ICollection<LessonInstructor> LessonInstructors { get; set; } = [];
     

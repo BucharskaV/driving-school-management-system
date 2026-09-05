@@ -4,7 +4,19 @@ namespace DrivingSchool.Domain.Models;
 
 public class Student : User
 {
-    public DateTime DateOfBirth { get; set; }
+    private DateTime _dateOfBirth;
+    public DateTime DateOfBirth
+    {
+        get => _dateOfBirth;
+        set
+        {
+            if (value > DateTime.UtcNow)
+            {
+                throw new ArgumentException("Date of birth cannot be in the future");
+            }
+            _dateOfBirth = value;
+        }
+    }
 
     public int Age
     {

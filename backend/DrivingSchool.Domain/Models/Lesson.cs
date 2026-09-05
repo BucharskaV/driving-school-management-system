@@ -3,7 +3,23 @@
 public abstract class Lesson
 {
     public int Id { get; private init; }
-    public string Name { get; set; }
+    private string _name;
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if(String.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException("Name cannot be empty");
+            }
+            if (value.Length > 50)
+            {
+                throw new ArgumentException("Name cannot be longer than 50 characters");
+            }
+            _name = value.Trim();
+        }
+    }
     public int SequenceNumber { get; set; }
     public TimeSpan Duration { get; set; }
     public virtual ICollection<LessonProgress> LessonProgresses { get; set; } = [];

@@ -6,7 +6,19 @@ public class LessonProgress
 {
     public ProgressStatus ProgressStatus{ get; set; }
     public DateTime? StartTime{ get; set; }
-    public string? Note { get; set; }
+    private string? _note;
+    public string? Note
+    {
+        get => _note;
+        set
+        {
+            if (value != null && value.Length > 200)
+            {
+                throw new ArgumentException("Note cannot be longer than 200 characters");
+            }
+            _note = value?.Trim();
+        }
+    }
     
     private DateTime? _endTime;
     public DateTime? EndTime{ get; set; }
